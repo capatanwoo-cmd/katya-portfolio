@@ -12,3 +12,5 @@
 @media(max-width:600px){.career-row{grid-template-columns:110px minmax(0,1fr)}#buggy .case-head h2{font-size:clamp(38px,12vw,63px)}}
 @media(max-width:360px){.career-row{grid-template-columns:100px minmax(0,1fr)}}
 @media(max-width:1100px){.career{grid-template-columns:minmax(0,1fr)}.career-map{min-width:0}}
+/* Native horizontal swipes on touch screens; mouse dragging remains scripted. */
+.drag-rail{touch-action:auto}
