@@ -8,9 +8,6 @@
  function syncButton(){if(preference.matches){effects.textContent='Анимация уменьшена';effects.disabled=true;}else{effects.disabled=false;effects.textContent=root.dataset.motion==='off'?'Включить эффекты':'Остановить эффекты';}effects.setAttribute('aria-pressed',String(motionOff()));}
  effects.addEventListener('click',()=>{root.dataset.motion=root.dataset.motion==='off'?'on':'off';if(motionOff())animations.forEach(a=>a.finish());syncButton();document.dispatchEvent(new CustomEvent('portfolio-motion'));});
  preference.addEventListener('change',()=>{if(motionOff())animations.forEach(a=>a.finish());syncButton();document.dispatchEvent(new CustomEvent('portfolio-motion'));});syncButton();
- const careerButtons=[...document.querySelectorAll('[data-career]')];
- function selectCareer(key){careerButtons.forEach(button=>{const active=button.dataset.career===key;button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active));});}
- careerButtons.forEach(button=>{button.addEventListener('click',()=>selectCareer(button.dataset.career));button.addEventListener('focus',()=>selectCareer(button.dataset.career));});
  const map=document.querySelector('.career-map');
  new IntersectionObserver(entries=>map.classList.toggle('in-view',entries[0].isIntersecting),{threshold:.15}).observe(map);
  const title=document.getElementById('intro-title');

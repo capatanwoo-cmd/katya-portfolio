@@ -24,24 +24,33 @@ function openGallery(title,description,ids){
 document.querySelectorAll('[data-close]').forEach(button=>button.addEventListener('click',()=>document.getElementById(button.dataset.close).close()));
 for(const dialog of [galleryDialog,imageDialog])dialog.addEventListener('click',event=>{if(event.target!==dialog)return;const r=dialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)dialog.close();});
 const select=$('#doctrine-position');
-DOCTRINE.forEach((product,index)=>{const option=make('option','',product.label);option.value=String(index);select.append(option);const thumb=make('button','position-thumb');thumb.type='button';thumb.setAttribute('aria-label',`Выбрать: ${product.label}`);thumb.setAttribute('aria-pressed','false');const image=make('img');image.src=MEDIA[product.main].src;image.alt=product.label;image.loading='lazy';image.width=81;image.height=108;thumb.append(image);thumb.addEventListener('click',()=>renderProduct(index,false));$('#doctrine-strip').append(thumb);});
-function renderProduct(index,scrollThumb=true){
- productIndex=(index+DOCTRINE.length)%DOCTRINE.length;const product=DOCTRINE[productIndex],ids=[product.main,...product.slides],media=MEDIA[product.main];
- select.value=String(productIndex);$('#doctrine-count').textContent=`${productIndex+1} / ${DOCTRINE.length}`;$('#doctrine-current-label').textContent=product.label;
- const main=$('#doctrine-main-image');main.src=media.src;main.alt=`Doctrine — ${product.label}`;main.width=media.width;main.height=media.height;$('#doctrine-main').setAttribute('aria-label',`Увеличить главную карточку: ${product.label}`);
- const preview=$('#doctrine-preview');preview.replaceChildren();preview.classList.toggle('empty',product.slides.length===0);
- if(product.slides.length){product.slides.slice(0,4).forEach((id,i)=>preview.append(imageButton(id,`${product.label}, слайд ${i+1}`,ids,i+1)));}
- else{const block=make('div','position-empty');block.append(make('strong','','FRESH\nMEAT'),make('p','','Индейка. Главная карточка для корма собак средних и крупных пород.'));preview.append(block);}
- const full=$('#doctrine-full');full.replaceChildren(document.createTextNode(product.slides.length?`Вся воронка (${ids.length} слайдов) `:'Рассмотреть карточку '));const arrow=make('span','','↗');arrow.setAttribute('aria-hidden','true');full.append(arrow);
- [...$('#doctrine-strip').children].forEach((thumb,i)=>{thumb.classList.toggle('active',i===productIndex);thumb.setAttribute('aria-pressed',String(i===productIndex));});
- if(scrollThumb)$('#doctrine-strip').children[productIndex].scrollIntoView({behavior:reduced()?'instant':'smooth',block:'nearest',inline:'nearest'});
+let productFilter='all',currentGeo='garage';
+const filteredProducts=()=>DOCTRINE.map((_,i)=>i).filter(i=>productFilter==='all'||(productFilter==='cats'?i<6:i>=6));
+function syncProductOptions(){select.replaceChildren();filteredProducts().forEach(index=>{const option=make('option','',DOCTRINE[index].label);option.value=String(index);select.append(option);});}
+function renderProduct(index){
+ const available=filteredProducts();productIndex=available.includes(index)?index:available[0];
+ const product=DOCTRINE[productIndex],ids=[product.main,...product.slides],rail=$('#doctrine-funnel-rail');
+ select.value=String(productIndex);$('#doctrine-count').textContent=`${available.indexOf(productIndex)+1} / ${available.length}`;$('#doctrine-current-label').textContent=product.label;
+ rail.replaceChildren();rail.classList.toggle('single',ids.length===1);
+ ids.forEach((id,i)=>{const card=make('figure','showcase-card funnel-card liquid-glass');const button=imageButton(id,`Doctrine — ${product.label}, слайд ${i+1}`,ids,i);if(!i){button.id='doctrine-main';button.querySelector('img').id='doctrine-main-image';}card.append(button,make('figcaption','',i?`Слайд ${String(i).padStart(2,'0')}`:'Главная карточка'));rail.append(card);});
+ $('#doctrine-full').textContent=ids.length>1?`Вся воронка (${ids.length} слайдов) ↗`:'Рассмотреть карточку ↗';rail.scrollLeft=0;rail.dispatchEvent(new CustomEvent('portfolio-rail-update',{bubbles:true}));
 }
-select.addEventListener('change',()=>renderProduct(Number(select.value),false));$('#doctrine-prev').addEventListener('click',()=>renderProduct(productIndex-1));$('#doctrine-next').addEventListener('click',()=>renderProduct(productIndex+1));
-$('#doctrine-main').addEventListener('click',()=>{const p=DOCTRINE[productIndex];openImage([p.main,...p.slides],0,`Doctrine — ${p.label}`);});
+document.querySelectorAll('[data-doctrine-filter]').forEach(button=>button.addEventListener('click',()=>{productFilter=button.dataset.doctrineFilter;document.querySelectorAll('[data-doctrine-filter]').forEach(b=>{const active=b===button;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});syncProductOptions();renderProduct(productIndex);}));
+select.addEventListener('change',()=>renderProduct(Number(select.value)));
+function stepProduct(direction){const ids=filteredProducts();renderProduct(ids[(ids.indexOf(productIndex)+direction+ids.length)%ids.length]);}
+$('#doctrine-prev').addEventListener('click',()=>stepProduct(-1));$('#doctrine-next').addEventListener('click',()=>stepProduct(1));
 $('#doctrine-full').addEventListener('click',()=>{const p=DOCTRINE[productIndex];openGallery(`Doctrine — ${p.label}`,'Главная карточка и слайды инфографики для этой позиции. Photoshop / Figma.',[p.main,...p.slides]);});
-renderProduct(0,false);
-function renderGeo(key){const group=GEO[key];const rail=$('#geo-rail');rail.replaceChildren();group.images.forEach((id,i)=>rail.append(imageButton(id,`${group.title}, креатив ${i+1}`,group.images,i)));rail.scrollLeft=0;$('#geo-caption').textContent=`${group.caption} / работ: ${group.images.length}`;document.querySelectorAll('[data-geo]').forEach(button=>{const active=button.dataset.geo===key;button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active));});}
-document.querySelectorAll('[data-geo]').forEach(button=>button.addEventListener('click',()=>renderGeo(button.dataset.geo)));renderGeo('laser');
+syncProductOptions();renderProduct(0);
+function renderGeo(key){
+ currentGeo=key;const group=GEO[key],rail=$('#geo-rail');rail.replaceChildren();
+ group.images.forEach((id,i)=>{const square=group.squares.includes(id),story=group.stories.indexOf(id),label=id===group.route?'Как пройти':square?`Витрина услуг ${String(group.squares.indexOf(id)+1).padStart(2,'0')}`:`Сторис ${String(story+1).padStart(2,'0')}`;
+ const card=make('figure',`showcase-card geo-card liquid-glass ${square?'geo-square':'geo-story'}`);card.dataset.tilt='';card.style.setProperty('--stagger',`${square?72:i===0?0:(i%3)*22}px`);card.append(imageButton(id,`${group.title}, креатив ${i+1}`,group.images,i),make('figcaption','',label));rail.append(card);});
+ rail.scrollLeft=0;$('#geo-caption').textContent=`${group.title} · материалов: ${group.images.length}`;
+ $('.geo-order').textContent=group.squares.length?'Как пройти → Сторис → Витрина услуг':'Как пройти → Сторис';
+ document.querySelectorAll('[data-geo]').forEach(button=>{const active=button.dataset.geo===key;button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active));});rail.dispatchEvent(new CustomEvent('portfolio-rail-update',{bubbles:true}));
+}
+document.querySelectorAll('[data-geo]').forEach(button=>button.addEventListener('click',()=>renderGeo(button.dataset.geo)));renderGeo('garage');
+$('#geo-all').addEventListener('click',()=>{const g=GEO[currentGeo];openGallery(g.title,g.caption,g.images);});
 GALLERIES.statera.images.forEach((id,i)=>$('#statera-gallery').append(imageButton(id,`Statera — этикетка паштета, вариант ${i+1}`,GALLERIES.statera.images,i)));
 [1,2].forEach(id=>$('#spices-details').append(imageButton(id,'Дизайн этикетки для специй',GALLERIES.spices.images,GALLERIES.spices.images.indexOf(id))));
 
