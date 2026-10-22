@@ -52,11 +52,8 @@ function renderGeo(key){
 document.querySelectorAll('[data-geo]').forEach(button=>button.addEventListener('click',()=>renderGeo(button.dataset.geo)));renderGeo('garage');
 $('#geo-all').addEventListener('click',()=>{const g=GEO[currentGeo];openGallery(g.title,g.caption,g.images);});
 GALLERIES.statera.images.forEach((id,i)=>$('#statera-gallery').append(imageButton(id,`Statera — этикетка паштета, вариант ${i+1}`,GALLERIES.statera.images,i)));
-[1,2].forEach(id=>$('#spices-details').append(imageButton(id,'Дизайн этикетки для специй',GALLERIES.spices.images,GALLERIES.spices.images.indexOf(id))));
 
-for(const key of ['windows']){const group=GALLERIES[key];const button=make('button','more-card');button.type='button';button.setAttribute('aria-label',`Открыть: ${group.title}`);const imageWrap=make('div','more-image'),img=make('img');img.src=MEDIA[group.cover].src;img.alt=group.title;img.width=MEDIA[group.cover].width;img.height=MEDIA[group.cover].height;img.loading='lazy';imageWrap.append(img);const title=make('h3','',group.title);title.append(make('span','','↗'));button.append(imageWrap,title,make('p','',`Работ в подборке: ${group.images.length}`));button.addEventListener('click',()=>openGallery(group.title,group.description,group.images));$('#more-grid').append(button);}
 document.querySelectorAll('[data-open-gallery]').forEach(button=>button.addEventListener('click',()=>{const group=GALLERIES[button.dataset.openGallery];openGallery(group.title,group.description,group.images);}));
-document.querySelectorAll('[data-image]').forEach(button=>button.addEventListener('click',()=>{const id=Number(button.dataset.image);openImage(GALLERIES.spices.images,GALLERIES.spices.images.indexOf(id),'Специи — этикетка и 3D');}));
 document.querySelectorAll('[data-scroll]').forEach(button=>button.addEventListener('click',()=>{const rail=document.getElementById(button.dataset.scroll);rail.scrollBy({left:Number(button.dataset.direction)*(rail.clientWidth*.78),behavior:reduced()?'instant':'smooth'});}));
 for(const rail of document.querySelectorAll('.rail'))rail.addEventListener('keydown',event=>{if(event.target!==rail)return;if(event.key==='ArrowRight'||event.key==='ArrowLeft'){event.preventDefault();rail.scrollBy({left:(event.key==='ArrowRight'?1:-1)*rail.clientWidth*.7,behavior:reduced()?'instant':'smooth'});}});
 for(const dialog of [galleryDialog,imageDialog])dialog.addEventListener('close',()=>{$('#image-full').removeAttribute('src');});
@@ -66,3 +63,8 @@ function renderBuggy(index){buggyIndex=index;const group=BUGGY[index],rail=$('#b
 document.querySelectorAll('[data-buggy]').forEach(b=>b.addEventListener('click',()=>renderBuggy(Number(b.dataset.buggy))));
 $('#buggy-all').addEventListener('click',()=>{const g=BUGGY[buggyIndex];openGallery(g.title,'Инфографика детских игрушек / ГК «Примио».',g.images);});renderBuggy(0);
 GALLERIES.ads.images.forEach((id,i)=>$('#petfabric-fallback-rail').append(imageButton(id,`PetFabric, изображение ${i+1}`,GALLERIES.ads.images,i)));
+
+const spiceVisualIds=SPICE_VISUALS.map(x=>x.id),spiceLabelIds=[1,2,3];
+$('#spice-visuals-all').addEventListener('click',()=>openGallery('Приправы — визуализации','Общий кадр и пять отдельных вкусов. AI / Nano Banana.',spiceVisualIds));
+const spiceFallback=$('#spice-morph-fallback');spiceFallback.append(imageButton(270,'Вся линейка приправ',spiceVisualIds,0));
+spiceLabelIds.forEach((id,i)=>{const titles=['Грузинская острая','Пикантная','Бавария'];const button=make('button','text-button',`${titles[i]} ↗`);button.type='button';button.addEventListener('click',()=>openImage(spiceLabelIds,i,'Дизайн этикеток приправ'));$('#spice-label-access').append(button);});
