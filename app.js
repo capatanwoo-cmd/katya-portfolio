@@ -64,7 +64,11 @@ document.querySelectorAll('[data-buggy]').forEach(b=>b.addEventListener('click',
 $('#buggy-all').addEventListener('click',()=>{const g=BUGGY[buggyIndex];openGallery(g.title,'Инфографика детских игрушек / ГК «Примио».',g.images);});renderBuggy(0);
 GALLERIES.ads.images.forEach((id,i)=>$('#petfabric-fallback-rail').append(imageButton(id,`PetFabric, изображение ${i+1}`,GALLERIES.ads.images,i)));
 
-const spiceVisualIds=SPICE_VISUALS.map(x=>x.id),spiceLabelIds=[1,2,3];
+const spiceVisualIds=SPICE_VISUALS.map(x=>x.id),spiceLabelIds=SPICE_LABELS.map(x=>x.id);
 $('#spice-visuals-all').addEventListener('click',()=>openGallery('Приправы — визуализации','Общий кадр и пять отдельных вкусов. AI / Nano Banana.',spiceVisualIds));
 const spiceFallback=$('#spice-morph-fallback');spiceFallback.append(imageButton(270,'Вся линейка приправ',spiceVisualIds,0));
-spiceLabelIds.forEach((id,i)=>{const titles=['Грузинская острая','Пикантная','Бавария'];const button=make('button','text-button',`${titles[i]} ↗`);button.type='button';button.addEventListener('click',()=>openImage(spiceLabelIds,i,'Дизайн этикеток приправ'));$('#spice-label-access').append(button);});
+SPICE_LABELS.forEach((item,i)=>{const button=make('button','text-button',`${item.title} ↗`);button.type='button';button.addEventListener('click',()=>openImage(spiceLabelIds,i,'Дизайн этикеток приправ'));$('#spice-label-access').append(button);});
+let economyIndex=0;
+function renderEconomy(index){economyIndex=index;const group=ECONOMY[index],rail=$('#economy-rail');rail.replaceChildren();group.images.forEach((id,i)=>{const card=make('figure','showcase-card funnel-card liquid-glass');card.append(imageButton(id,`${group.title}, слайд ${i+1}`,group.images,i),make('figcaption','',`Слайд ${String(i+1).padStart(2,'0')}`));rail.append(card);});$('#economy-count').textContent=`${group.images.length} слайдов`;$('#economy-label').textContent=group.title;$('#economy-all').textContent=`Вся подборка (${group.images.length} слайдов) ↗`;document.querySelectorAll('[data-economy]').forEach(b=>{const active=Number(b.dataset.economy)===index;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});rail.scrollLeft=0;rail.dispatchEvent(new CustomEvent('portfolio-rail-update',{bubbles:true}));}
+document.querySelectorAll('[data-economy]').forEach(b=>b.addEventListener('click',()=>renderEconomy(Number(b.dataset.economy))));
+$('#economy-all').addEventListener('click',()=>{const group=ECONOMY[economyIndex];openGallery(group.title,'Инфографика для эконом-сегмента.',group.images);});renderEconomy(0);
