@@ -33,7 +33,7 @@ function renderProduct(index){
  select.value=String(productIndex);$('#doctrine-count').textContent=`${available.indexOf(productIndex)+1} / ${available.length}`;$('#doctrine-current-label').textContent=product.label;
  rail.replaceChildren();rail.classList.toggle('single',ids.length===1);
  ids.forEach((id,i)=>{const card=make('figure','showcase-card funnel-card liquid-glass');const button=imageButton(id,`Doctrine — ${product.label}, слайд ${i+1}`,ids,i);if(!i){button.id='doctrine-main';button.querySelector('img').id='doctrine-main-image';}card.append(button,make('figcaption','',i?`Слайд ${String(i).padStart(2,'0')}`:'Главная карточка'));rail.append(card);});
- $('#doctrine-full').textContent=ids.length>1?`Вся воронка (${ids.length} слайдов) ↗`:'Рассмотреть карточку ↗';rail.scrollLeft=0;rail.dispatchEvent(new CustomEvent('portfolio-rail-update',{bubbles:true}));
+ $('#doctrine-full').textContent=ids.length>1?`Вся воронка (${ids.length} слайдов) ↗`:'Рассмотреть карточку ↗';rail.scrollLeft=0;rail.dispatchEvent(new CustomEvent('portfolio-rail-update',{bubbles:true}));select.dispatchEvent(new CustomEvent('portfolio-select-update'));
 }
 document.querySelectorAll('[data-doctrine-filter]').forEach(button=>button.addEventListener('click',()=>{productFilter=button.dataset.doctrineFilter;document.querySelectorAll('[data-doctrine-filter]').forEach(b=>{const active=b===button;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});syncProductOptions();renderProduct(productIndex);}));
 select.addEventListener('change',()=>renderProduct(Number(select.value)));
@@ -51,7 +51,7 @@ function renderGeo(key){
 }
 document.querySelectorAll('[data-geo]').forEach(button=>button.addEventListener('click',()=>renderGeo(button.dataset.geo)));renderGeo('garage');
 $('#geo-all').addEventListener('click',()=>{const g=GEO[currentGeo];openGallery(g.title,g.caption,g.images);});
-GALLERIES.statera.images.forEach((id,i)=>$('#statera-gallery').append(imageButton(id,`Statera — этикетка паштета, вариант ${i+1}`,GALLERIES.statera.images,i)));
+GALLERIES.statera.images.forEach((id,i)=>{const card=make('figure','showcase-card pack-card liquid-glass');card.dataset.tilt='';card.style.setProperty('--stagger',`${[0,28,56,20][i]}px`);card.append(imageButton(id,`Statera — этикетка паштета, вариант ${i+1}`,GALLERIES.statera.images,i),make('figcaption','',['С рыбой','С индейкой','С кроликом','С ягнёнком'][i]));$('#statera-gallery').append(card);});
 
 document.querySelectorAll('[data-open-gallery]').forEach(button=>button.addEventListener('click',()=>{const group=GALLERIES[button.dataset.openGallery];openGallery(group.title,group.description,group.images);}));
 document.querySelectorAll('[data-scroll]').forEach(button=>button.addEventListener('click',()=>{const rail=document.getElementById(button.dataset.scroll);rail.scrollBy({left:Number(button.dataset.direction)*(rail.clientWidth*.78),behavior:reduced()?'instant':'smooth'});}));
