@@ -25,3 +25,12 @@ html[data-motion=off] .pack-card{transform:none;transition:none}
 .spice-morph-root .morph-slider-indicators{right:140px;bottom:27px;gap:8px}
 .spice-morph-root .morph-slider-controls{top:auto;bottom:14px;left:auto;right:0;width:112px;padding:0;transform:none}
 @media(max-width:600px){.petfabric-canvas{--edge-fade:48px}.spice-morph-root .morph-slider-stage{bottom:116px}.spice-morph-root .morph-slider-caption{bottom:78px;max-width:100%}.spice-morph-root .morph-slider-caption-text{font-size:17px}.spice-morph-root .morph-slider-indicators{left:0;right:auto;bottom:28px;gap:4px}.spice-morph-root .morph-slider-controls{bottom:14px;width:106px}}
+
+/* Backdrop blur inside a masked scrolling layer can leave stale GPU tiles. */
+.drag-rail .showcase-card.liquid-glass{backdrop-filter:none;-webkit-backdrop-filter:none;isolation:isolate;overflow:hidden}
+.drag-rail .showcase-card.liquid-glass::after{display:none}
+.drag-rail .showcase-card.liquid-glass::before{z-index:2}
+.drag-rail .showcase-card .image-button,.drag-rail .showcase-card figcaption{position:relative;z-index:1}
+.contact-links{display:flex;align-items:center;flex-wrap:wrap;gap:16px 32px;min-width:0}
+.contact-links a{width:max-content;max-width:100%}
+@media(max-width:600px){.contact-links{gap:16px 24px}.contact-bottom{align-items:flex-start}}
