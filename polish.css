@@ -6,3 +6,13 @@
 @media(prefers-reduced-motion:reduce){.pack-card,.back-to-top,.product-combobox>svg{transition:none}.pack-card{transform:none}}
 html[data-motion=off] .pack-card{transform:none;transition:none}
 .product-selector>div:first-child{gap:0}#doctrine-position[hidden]{display:none}
+
+/* Cards dissolve into the shared background instead of ending at a hard crop. */
+#curved-stage,.petfabric-canvas{--edge-fade:clamp(35px,7vw,180px);-webkit-mask-image:linear-gradient(to right,transparent,#000 var(--edge-fade),#000 calc(100% - var(--edge-fade)),transparent);mask-image:linear-gradient(to right,transparent,#000 var(--edge-fade),#000 calc(100% - var(--edge-fade)),transparent)}
+.drag-rail,.rail,.position-strip{scroll-snap-type:none!important;scroll-behavior:auto}
+.drag-rail>*{scroll-snap-align:none}
+.drag-rail{--fade-start:0px;--fade-end:80px;-webkit-mask-image:linear-gradient(to right,transparent,#000 var(--fade-start),#000 calc(100% - var(--fade-end)),transparent);mask-image:linear-gradient(to right,transparent,#000 var(--fade-start),#000 calc(100% - var(--fade-end)),transparent)}
+.spice-morph-root .morph-slider,.spice-fallback .image-button,.spice-drift-stage .drift-wall__inner,.spice-drift-stage .drift-wall__tile{background:transparent}
+.spice-drift-stage .drift-wall__overlay{display:none}
+.page-views img{background:transparent}
+@media(max-width:600px){#curved-stage,.petfabric-canvas{--edge-fade:28px}}

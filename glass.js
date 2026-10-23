@@ -10,7 +10,7 @@
  document.querySelectorAll('.drag-rail').forEach(rail=>{
   let start=null,dragging=false,suppressUntil=0,frame=0,velocity=0,last=0,lastTime=0;
   const controls=[...document.querySelectorAll('[data-scroll]')].filter(b=>b.dataset.scroll===rail.id);
-  const sync=()=>controls.forEach(b=>b.disabled=Number(b.dataset.direction)<0?rail.scrollLeft<2:rail.scrollLeft>=rail.scrollWidth-rail.clientWidth-2);
+  const sync=()=>{const remaining=rail.scrollWidth-rail.clientWidth-rail.scrollLeft;rail.style.setProperty('--fade-start',`${Math.min(rail.scrollLeft,80)}px`);rail.style.setProperty('--fade-end',`${Math.max(0,Math.min(remaining,80))}px`);controls.forEach(b=>b.disabled=Number(b.dataset.direction)<0?rail.scrollLeft<2:remaining<2);};
   const stop=()=>{cancelAnimationFrame(frame);velocity=0;rail.classList.remove('dragging');};
   rail.addEventListener('pointerdown',e=>{if(e.button!==0||e.pointerType==='touch')return;stop();start={x:e.clientX,y:e.clientY,id:e.pointerId};last=e.clientX;lastTime=performance.now();dragging=false;});
   rail.addEventListener('pointermove',e=>{if(!start)return;const dx=e.clientX-start.x,dy=e.clientY-start.y;if(!dragging){if(Math.abs(dy)>Math.abs(dx)&&Math.abs(dy)>8){start=null;return;}if(Math.abs(dx)<7)return;dragging=true;rail.classList.add('dragging');rail.setPointerCapture(start.id);}e.preventDefault();const now=performance.now(),delta=e.clientX-last;rail.scrollLeft-=delta;velocity=-delta/Math.max(1,now-lastTime)*1000;last=e.clientX;lastTime=now;});
